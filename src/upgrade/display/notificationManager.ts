@@ -51,8 +51,11 @@ class NotificationManager implements IUpgradeIssuesRenderer {
                 const nonCVEIssues = issues.filter(
                         (i) => i.reason !== UpgradeReason.CVE
                     );
-                const hasCVEIssue = cveIssues.length > 0;
-                const issue = hasCVEIssue ? cveIssues[0] : nonCVEIssues[0];
+                // Prefer Java upgrade issues over CVE issues. Only surface the CVE
+                // notification when there are no Java upgrade issues to recommend.
+                const hasUpgradeIssue = nonCVEIssues.length > 0;
+                const hasCVEIssue = !hasUpgradeIssue && cveIssues.length > 0;
+                const issue = hasUpgradeIssue ? nonCVEIssues[0] : cveIssues[0];
 
                 if (!this.shouldShow()) {
                     return;
